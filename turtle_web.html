@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Turtle Web Controller</title>
+  <script src="https://cdn.jsdelivr.net/npm/roslib/build/roslib.min.js"></script>
+</head>
+<body>
+  <h1>Turtle Web Controller</h1>
+
+  <button onclick="moveForward()">Move Forward</button>
+  <button onclick="moveBackward()">Move Backward</button>
+  <button onclick="rotateLeft()">Rotate Left</button>
+  <button onclick="rotateRight()">Rotate Right</button>
+
+  <p id="pose"></p>
+
+  <script>
+    const ros = new ROSLIB.Ros({ url: 'ws://localhost:9090' });
+
+    ros.on('connection', () => console.log('Connected to rosbridge!'));
+    ros.on('error', (err) => console.log('Error:', err));
+    ros.on('close', () => console.log('Connection closed.'));
+
+    const cmdVel = new ROSLIB.Topic({
+      ros: ros,
+      name: '/turtle1/cmd_vel',
+      messageType: 'geometry_msgs/Twist'
+    });
+
+    const poseTopic = new ROSLIB.Topic({
+      ros: ros,
+      name: '/turtle1/pose',
+      messageType: 'turtlesim/Pose'
+    });
+
+    poseTopic.subscribe((msg) => {
+      document.getElementById('pose').innerText =
+        'Turtle position: x=' + msg.x.toFixed(2) + ', y=' + msg.y.toFixed(2) + ', theta=' + msg.theta.toFixed(2);
+    });
+
+    function moveForward() {
+      cmdVel.publish(new ROSLIB.Message({ linear: {x:1, y:0, z:0}, angular: {x:0, y:0, z:0} }));
+    }
+
+    function moveBackward() {
+      cmdVel.publish(new ROSLIB.Message({ linear: {x:-1, y:0, z:0}, angular: {x:0, y:0, z:0} }));
+    }
+
+    function rotateLeft() {
+      cmdVel.publish(new ROSLIB.Message({ linear: {x:0, y:0, z:0}, angular: {x:0, y:0, z:1} }));
+    }
+
+    function rotateRight() {
+      cmdVel.publish(new ROSLIB.Message({ linear: {x:0, y:0, z:0}, angular: {x:0, y:0, z:-1} }));
+    }
+  </script>
+</body>
+</html>
