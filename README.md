@@ -69,12 +69,6 @@ Open `index.html` directly in your browser (no server needed):
 xdg-open index.html # Linux
 open index.html # macOS
 ```
-
-Or serve it with any static file server:
-```bash
-python3 -m http.server 8080
-# then visit http://localhost:8080
-```
 ---
 
 ## Usage
